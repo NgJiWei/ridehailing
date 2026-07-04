@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,10 +18,10 @@
             --accent-foreground: #4a3400;
             --border: #dde0e6;
             --success: #2ECC71;
-            --success-bg: rgba(46, 204, 113, 0.1);
+            --success-bg: rgba(46, 204, 113, 0.15);
             --success-border: #96e3b7;
             --destructive: #E74C3C;
-            --destructive-bg: rgba(231, 76, 60, 0.1);
+            --destructive-bg: rgba(231, 76, 60, 0.15);
             --destructive-border: #f1a8a2;
             --radius: 12px;
             --shadow-sm: 0 2px 12px rgba(0,0,0,0.02), 0 1px 2px -1px rgba(0,0,0,0.02);
@@ -174,7 +174,7 @@
         }
         .progress-flag svg {width:16px;height:16px;}
 
-        /* Video Player */
+        /* Video Container + OVERLAY QUESTION BOX (Your requested design) */
         .video-section {
             margin-bottom: 32px;
             animation: fadeInUp 0.6s ease-out 0.2s both;
@@ -209,6 +209,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            z-index: 10;
         }
         .video-loading.active {opacity:1;pointer-events:auto;}
         .spinner {
@@ -222,17 +223,24 @@
         }
         .video-loading p {font-size:0.875rem;color:var(--muted-foreground);}
 
-        /* Question Card */
+        /* QUESTION OVERLAY SITS ON TOP OF VIDEO */
         .question-card {
-            background: var(--card);
+            position: absolute;
+            inset: 16px;
+            bottom: 16px;
+            background: rgba(255,255,255,0.86);
+            backdrop-filter: blur(8px);
             border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.05);
-            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 20px;
             display: none;
             opacity:0;
             transform: translateY(20px);
             transition: opacity 0.4s ease, transform 0.4s ease;
+            overflow-y: auto;
+            max-height: calc(100% - 32px);
+            z-index: 5;
         }
         .question-card.visible {
             display:block;
@@ -240,13 +248,13 @@
             transform: translateY(0);
             animation: fadeInUp 0.4s ease-out;
         }
-        @media(min-width:768px){.question-card{padding:32px;}}
+        @media(min-width:768px){.question-card{padding:28px;}}
 
         .question-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom:20px;
+            margin-bottom:14px;
         }
         .question-counter {
             font-size:0.875rem;
@@ -266,44 +274,44 @@
         .question-status svg {width:16px;height:16px;}
 
         .question-text {
-            font-size:1.25rem;
+            font-size:1.1rem;
             font-weight:600;
             line-height:1.4;
-            margin-bottom:24px;
+            margin-bottom:16px;
         }
-        @media(min-width:768px){.question-text{font-size:1.5rem;}}
+        @media(min-width:768px){.question-text{font-size:1.3rem;}}
 
         .options-list {
             display:flex;
             flex-direction:column;
-            gap:12px;
-            margin-bottom:24px;
+            gap:9px;
+            margin-bottom:16px;
         }
         .option-btn {
             width:100%;
             text-align:left;
-            padding:16px;
-            border-radius:12px;
+            padding:12px 14px;
+            border-radius:10px;
             border:2px solid var(--border);
-            background:var(--card);
+            background:rgba(255,255,255,0.75);
             color:var(--foreground);
-            font-size:0.95rem;
+            font-size:0.92rem;
             cursor:pointer;
             display:flex;
             align-items:center;
-            gap:12px;
+            gap:10px;
             transition:all 0.2s ease;
             font-family:inherit;
         }
         .option-btn:not(:disabled):hover {
             border-color: rgba(45,108,223,0.4);
-            background: rgba(45,108,223,0.04);
-            transform: translateX(4px);
+            background: rgba(45,108,223,0.07);
+            transform: translateX(3px);
         }
         .option-btn.selected {
             border-color:var(--primary);
             background:var(--primary-light);
-            box-shadow: 0 0 0 4px rgba(45,108,223,0.1);
+            box-shadow: 0 0 0 3px rgba(45,108,223,0.1);
         }
         .option-btn.correct {
             border-color:var(--success);
@@ -316,13 +324,13 @@
             cursor:default;
         }
         .option-btn:disabled:not(.correct):not(.wrong) {
-            opacity:0.5;
+            opacity:0.55;
             cursor:not-allowed;
         }
 
         .option-letter {
-            width:28px;
-            height:28px;
+            width:26px;
+            height:26px;
             flex-shrink:0;
             border-radius:50%;
             border:2px solid rgba(0,0,0,0.15);
@@ -330,7 +338,7 @@
             display:flex;
             align-items:center;
             justify-content:center;
-            font-size:0.8rem;
+            font-size:0.78rem;
             font-weight:600;
             transition:all 0.2s ease;
         }
@@ -353,18 +361,18 @@
         .submit-wrap {
             display:flex;
             justify-content:flex-end;
-            padding-top:8px;
+            padding-top:4px;
         }
         .btn {
             display:inline-flex;
             align-items:center;
             justify-content:center;
             gap:8px;
-            padding:12px 32px;
-            font-size:1rem;
+            padding:10px 26px;
+            font-size:0.95rem;
             font-weight:600;
             font-family:inherit;
-            border-radius:10px;
+            border-radius:9px;
             border:none;
             cursor:pointer;
             transition:all 0.2s ease;
@@ -393,6 +401,7 @@
             font-size:0.9rem;
             opacity:0.7;
             animation: fadeIn 0.5s ease 0.5s both;
+            margin-top:8px;
         }
         .hide {display:none !important;}
 
@@ -527,7 +536,7 @@
         @keyframes bounceIn {
             0% {transform:scale(0) rotate(-20deg);opacity:0;}
             60% {transform:scale(1.1) rotate(5deg);opacity:1;}
-            100% {transform:scale(1) rotate(0deg);opacity:1;}
+            100% {transform:scale(1) rotate(0deg);opacity:0;}
         }
     </style>
 </head>
@@ -572,32 +581,31 @@
 
     <div class="video-section">
         <div class="video-container">
-            <video id="videoPlayer" controls playsinline></video>
+            <video id="videoPlayer" controls playsinline muted></video>
             <div class="video-loading" id="videoLoading">
                 <div class="spinner"></div>
                 <p>Loading video...</p>
             </div>
+            <!-- QUESTION BOX OVERLAID DIRECTLY ON VIDEO -->
+            <div class="question-card" id="questionCard">
+                <div class="question-header">
+                    <span class="question-counter" id="questionCounter">Question 1 of 5</span>
+                    <span class="question-status" id="questionStatus"></span>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-list" id="optionsList"></div>
+                <div class="submit-wrap">
+                    <button class="btn btn-primary" id="submitBtn" disabled>
+                        Submit Answer
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
+        <div class="intro-hint" id="introHint">Watch the introduction video to begin the quiz</div>
     </div>
-
-    <div class="question-card" id="questionCard">
-        <div class="question-header">
-            <span class="question-counter" id="questionCounter">Question 1 of 5</span>
-            <span class="question-status" id="questionStatus"></span>
-        </div>
-        <div class="question-text" id="questionText"></div>
-        <div class="options-list" id="optionsList"></div>
-        <div class="submit-wrap">
-            <button class="btn btn-primary" id="submitBtn" disabled>
-                Submit Answer
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="9 18 15 12 9 6"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <div class="intro-hint" id="introHint">Watch the introduction video to begin the quiz</div>
 </div>
 
 <!-- Result Modal -->
@@ -748,7 +756,8 @@ function playVideo(src){
     setTimeout(()=>{
         videoPlayer.src = src;
         videoPlayer.load();
-        videoPlayer.play().catch(e=>{});
+        // Catch autoplay block error
+        videoPlayer.play().catch(err => console.log("Autoplay blocked, user needs click:", err));
         videoPlayer.oncanplay = ()=>{
             videoPlayer.classList.remove("fading");
             videoLoading.classList.remove("active");
