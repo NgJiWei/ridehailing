@@ -1,0 +1,896 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride-Hailing Externality Interactive Quiz</title>
+    <style>
+        :root {
+            --background: #F4F6F8;
+            --card: #ffffff;
+            --foreground: #1a1d23;
+            --muted-foreground: #6b7280;
+            --muted: #e5e7eb;
+            --primary: #2D6CDF;
+            --primary-foreground: #ffffff;
+            --primary-light: rgba(45, 108, 223, 0.1);
+            --accent: #FFB103;
+            --accent-foreground: #4a3400;
+            --border: #dde0e6;
+            --success: #2ECC71;
+            --success-bg: rgba(46, 204, 113, 0.1);
+            --success-border: #96e3b7;
+            --destructive: #E74C3C;
+            --destructive-bg: rgba(231, 76, 60, 0.1);
+            --destructive-border: #f1a8a2;
+            --radius: 12px;
+            --shadow-sm: 0 2px 12px rgba(0,0,0,0.02), 0 1px 2px -1px rgba(0,0,0,0.02);
+            --shadow-md: 0 2px 12px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.05);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--foreground);
+            min-height: 100vh;
+            line-height: 1.5;
+            padding: 32px 24px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        @media(min-width:768px){
+            header h1 {font-size: 1.9rem;}
+        }
+        header p {
+            color: var(--muted-foreground);
+            font-size: 0.9rem;
+        }
+
+        /* Progress Bar Area */
+        .progress-section {
+            margin-bottom: 32px;
+            animation: fadeInDown 0.6s ease-out 0.1s both;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+        }
+        .progress-label span:first-child {
+            font-weight: 500;
+            color: var(--muted-foreground);
+        }
+        .score-text {
+            font-weight: 600;
+        }
+
+        .progress-track-wrap {
+            position: relative;
+            height: 40px;
+        }
+        .progress-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 12px;
+            background: var(--muted);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-dashes {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 2px;
+            display: flex;
+            gap: 8px;
+            padding: 0 4px;
+        }
+        .progress-dashes span {
+            flex: 1;
+            height: 100%;
+            background: rgba(255,255,255,0.6);
+            border-radius: 999px;
+        }
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: rgba(45, 108, 223, 0.35);
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .progress-car {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 0%;
+            z-index: 10;
+            transition: left 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .car-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(45,108,223,0.3);
+        }
+        .car-icon svg {width:16px;height:16px;}
+
+        .progress-flag {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--muted);
+            color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+        .progress-flag.finished {
+            background: var(--success);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+        }
+        .progress-flag svg {width:16px;height:16px;}
+
+        /* Video Player */
+        .video-section {
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #111;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+        #videoPlayer.fading {opacity:0;}
+
+        .video-loading {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .video-loading.active {opacity:1;pointer-events:auto;}
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--muted);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom:12px;
+        }
+        .video-loading p {font-size:0.875rem;color:var(--muted-foreground);}
+
+        /* Question Card */
+        .question-card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 24px;
+            display: none;
+            opacity:0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .question-card.visible {
+            display:block;
+            opacity:1;
+            transform: translateY(0);
+            animation: fadeInUp 0.4s ease-out;
+        }
+        @media(min-width:768px){.question-card{padding:32px;}}
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom:20px;
+        }
+        .question-counter {
+            font-size:0.875rem;
+            font-weight:500;
+            color:var(--primary);
+        }
+        .question-status {
+            font-size:0.875rem;
+            font-weight:600;
+            display:flex;
+            align-items:center;
+            gap:4px;
+            display:none;
+        }
+        .question-status.correct {color:var(--success);display:flex;}
+        .question-status.wrong {color:var(--destructive);display:flex;}
+        .question-status svg {width:16px;height:16px;}
+
+        .question-text {
+            font-size:1.25rem;
+            font-weight:600;
+            line-height:1.4;
+            margin-bottom:24px;
+        }
+        @media(min-width:768px){.question-text{font-size:1.5rem;}}
+
+        .options-list {
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            margin-bottom:24px;
+        }
+        .option-btn {
+            width:100%;
+            text-align:left;
+            padding:16px;
+            border-radius:12px;
+            border:2px solid var(--border);
+            background:var(--card);
+            color:var(--foreground);
+            font-size:0.95rem;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            gap:12px;
+            transition:all 0.2s ease;
+            font-family:inherit;
+        }
+        .option-btn:not(:disabled):hover {
+            border-color: rgba(45,108,223,0.4);
+            background: rgba(45,108,223,0.04);
+            transform: translateX(4px);
+        }
+        .option-btn.selected {
+            border-color:var(--primary);
+            background:var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(45,108,223,0.1);
+        }
+        .option-btn.correct {
+            border-color:var(--success);
+            background:var(--success-bg);
+            cursor:default;
+        }
+        .option-btn.wrong {
+            border-color:var(--destructive);
+            background:var(--destructive-bg);
+            cursor:default;
+        }
+        .option-btn:disabled:not(.correct):not(.wrong) {
+            opacity:0.5;
+            cursor:not-allowed;
+        }
+
+        .option-letter {
+            width:28px;
+            height:28px;
+            flex-shrink:0;
+            border-radius:50%;
+            border:2px solid rgba(0,0,0,0.15);
+            color:var(--muted-foreground);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:0.8rem;
+            font-weight:600;
+            transition:all 0.2s ease;
+        }
+        .option-btn.selected .option-letter {
+            border-color:var(--primary);
+            background:var(--primary);
+            color:var(--primary-foreground);
+        }
+        .option-btn.correct .option-letter {
+            border-color:var(--success);
+            background:var(--success);
+            color:#fff;
+        }
+        .option-btn.wrong .option-letter {
+            border-color:var(--destructive);
+            background:var(--destructive);
+            color:#fff;
+        }
+
+        .submit-wrap {
+            display:flex;
+            justify-content:flex-end;
+            padding-top:8px;
+        }
+        .btn {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            padding:12px 32px;
+            font-size:1rem;
+            font-weight:600;
+            font-family:inherit;
+            border-radius:10px;
+            border:none;
+            cursor:pointer;
+            transition:all 0.2s ease;
+            box-shadow:var(--shadow-md);
+        }
+        .btn-primary {
+            background:var(--primary);
+            color:var(--primary-foreground);
+        }
+        .btn-primary:hover {
+            background:#255bc9;
+            transform:translateY(-1px);
+            box-shadow:0 6px 16px rgba(45,108,223,0.25);
+        }
+        .btn-primary:active {transform:translateY(0);}
+        .btn-primary:disabled {
+            opacity:0.5;
+            cursor:not-allowed;
+            box-shadow:none;
+        }
+        .btn svg {width:16px;height:16px;}
+
+        .intro-hint {
+            text-align:center;
+            color:var(--muted-foreground);
+            font-size:0.9rem;
+            opacity:0.7;
+            animation: fadeIn 0.5s ease 0.5s both;
+        }
+        .hide {display:none !important;}
+
+        /* Result Modal */
+        .modal-backdrop {
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(4px);
+            z-index:40;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:16px;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity 0.3s ease;
+        }
+        .modal-backdrop.active {opacity:1;pointer-events:auto;}
+        .modal {
+            background:var(--card);
+            border-radius:16px;
+            box-shadow:var(--shadow-lg);
+            max-width:448px;
+            width:100%;
+            padding:48px 32px;
+            text-align:center;
+            position:relative;
+            overflow:hidden;
+            opacity:0;
+            transform:scale(0.9) translateY(30px);
+            transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+        }
+        .modal-backdrop.active .modal {opacity:1;transform:scale(1) translateY(0);}
+
+        .modal-top-bar {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:6px;
+        }
+        .modal-top-bar.perfect {
+            background:linear-gradient(90deg, var(--success), var(--accent), var(--success));
+        }
+        .modal-top-bar.normal {
+            background:linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .modal-icon {
+            width:80px;
+            height:80px;
+            border-radius:50%;
+            margin:0 auto 24px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            animation: bounceIn 0.6s cubic-bezier(0.25,0.8,0.25,1) 0.2s both;
+        }
+        .modal-icon.perfect {background:var(--success-bg);color:var(--success);}
+        .modal-icon.normal {background:var(--primary-light);color:var(--primary);}
+        .modal-icon svg {width:40px;height:40px;}
+
+        #modalTitle {
+            font-size:1.5rem;
+            font-weight:700;
+            margin-bottom:8px;
+            animation: fadeInUp 0.4s ease 0.3s both;
+        }
+        @media(min-width:768px){#modalTitle{font-size:1.875rem;}}
+        .modal-subtitle {
+            color:var(--muted-foreground);
+            margin-bottom:20px;
+            animation: fadeInUp 0.4s ease 0.4s both;
+        }
+
+        .modal-score {
+            background:rgba(0,0,0,0.03);
+            border-radius:12px;
+            padding:20px;
+            margin-bottom:24px;
+            animation: fadeInUp 0.4s ease 0.5s both;
+        }
+        .modal-score .big {
+            font-size:2.25rem;
+            font-weight:700;
+            line-height:1;
+            margin-bottom:4px;
+        }
+        .modal-score .big .small {
+            font-size:1.5rem;
+            color:var(--muted-foreground);
+            font-weight:500;
+        }
+        .modal-score .pct {
+            font-size:0.875rem;
+            color:var(--muted-foreground);
+            font-weight:600;
+        }
+        #restartBtn {
+            width:100%;
+            animation: fadeInUp 0.4s ease 0.6s both;
+        }
+
+        /* Confetti */
+        .confetti-container {
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            z-index:50;
+            overflow:hidden;
+        }
+        .confetti-piece {
+            position:absolute;
+            top:-20px;
+            border-radius:2px;
+            opacity:0;
+            animation: confettiFall linear forwards;
+        }
+
+        /* Animations */
+        @keyframes confettiFall {
+            0% {transform: translateY(0) rotate(0deg);opacity:0;}
+            10% {opacity:1;}
+            80% {opacity:1;}
+            100% {transform: translateY(100vh) rotate(720deg);opacity:0;}
+        }
+        @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+        @keyframes fadeInDown {from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes fadeInUp {from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes spin {to{transform:rotate(360deg);}}
+        @keyframes bounceIn {
+            0% {transform:scale(0) rotate(-20deg);opacity:0;}
+            60% {transform:scale(1.1) rotate(5deg);opacity:1;}
+            100% {transform:scale(1) rotate(0deg);opacity:1;}
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Ride-Hailing Externalities</h1>
+        <p>Interactive Economics Video Quiz Presentation</p>
+    </header>
+
+    <div class="progress-section">
+        <div class="progress-label">
+            <span>Progress</span>
+            <span class="score-text" id="scoreDisplay">Score: 0/5</span>
+        </div>
+        <div class="progress-track-wrap">
+            <div class="progress-track">
+                <div class="progress-dashes">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-car" id="progressCar">
+                <div class="car-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L16.5 9c-1.1-.3-2.2-.3-3.3 0L6.5 11.1C5.7 11.3 5 12.1 5 13v3c0 .6.4 1 1 1h2"/>
+                        <circle cx="7" cy="17" r="2"/>
+                        <circle cx="17" cy="17" r="2"/>
+                        <path d="M5 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/>
+                        <path d="M19 17h1a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-1"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="progress-flag" id="progressFlag">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-section">
+        <div class="video-container">
+            <video id="videoPlayer" controls playsinline></video>
+            <div class="video-loading" id="videoLoading">
+                <div class="spinner"></div>
+                <p>Loading video...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+        <div class="question-header">
+            <span class="question-counter" id="questionCounter">Question 1 of 5</span>
+            <span class="question-status" id="questionStatus"></span>
+        </div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options-list" id="optionsList"></div>
+        <div class="submit-wrap">
+            <button class="btn btn-primary" id="submitBtn" disabled>
+                Submit Answer
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="intro-hint" id="introHint">Watch the introduction video to begin the quiz</div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal-backdrop" id="resultModal">
+    <div class="modal">
+        <div class="modal-top-bar" id="modalTopBar"></div>
+        <div class="modal-icon" id="modalIcon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+        </div>
+        <h2 id="modalTitle"></h2>
+        <p class="modal-subtitle" id="modalSubtitle"></p>
+        <div class="modal-score">
+            <div class="big">
+                <span id="modalCorrect">0</span><span class="small">/5</span>
+            </div>
+            <div class="pct" id="modalPercent">0%</div>
+        </div>
+        <button class="btn btn-primary" id="restartBtn">Restart Quiz</button>
+    </div>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// Video file paths
+const INTRO_VIDEO = "videos/intro.mp4";
+const QUESTIONS = [
+    {
+        question: "Deadheading (empty ride-hailing vehicles traveling to pick up passengers) most directly causes which externality?",
+        options: [
+            "Reduces traffic congestion by repositioning vehicles",
+            "Increases traffic congestion from extra empty vehicle miles",
+            "Has no measurable impact on road congestion",
+            "Only creates congestion during off-peak hours"
+        ],
+        correct: 1,
+        correctVideo: "videos/q1_correct.mp4",
+        wrongVideo: "videos/q1_wrong.mp4",
+        explainVideo: "videos/q1_explain.mp4"
+    },
+    {
+        question: "Which option represents a negative environmental externality created by ride-hailing platforms?",
+        options: [
+            "Lower fares for passengers",
+            "Increased carbon emissions from additional vehicle miles driven",
+            "More employment opportunities for drivers",
+            "Faster personal travel for all road users"
+        ],
+        correct: 1,
+        correctVideo: "videos/q2_correct.mp4",
+        wrongVideo: "videos/q2_wrong.mp4",
+        explainVideo: "videos/q2_explain.mp4"
+    },
+    {
+        question: "Economically speaking, ride-hailing generates:",
+        options: [
+            "Positive externality only",
+            "Negative externality only",
+            "Both positive and negative externalities",
+            "No externalities whatsoever"
+        ],
+        correct: 2,
+        correctVideo: "videos/q3_correct.mp4",
+        wrongVideo: "videos/q3_wrong.mp4",
+        explainVideo: "videos/q3_explain.mp4"
+    },
+    {
+        question: "How does ride-hailing typically affect public transit ridership in low-density suburban areas?",
+        options: [
+            "Always increases public transit use",
+            "Can substitute public transit trips, reducing ridership",
+            "Has zero effect on public transit numbers",
+            "Only impacts public transport on weekends"
+        ],
+        correct: 1,
+        correctVideo: "videos/q4_correct.mp4",
+        wrongVideo: "videos/q4_wrong.mp4",
+        explainVideo: "videos/q4_explain.mp4"
+    },
+    {
+        question: "Congestion pricing as a policy solution for ride-hailing externalities involves:",
+        options: [
+            "Lowering fares during rush hour",
+            "Charging ride-hailing drivers an entry fee for busy central zones at peak times",
+            "Adding more ride-hailing vehicles to road networks",
+            "Completely banning ride-hailing vehicles in city centres"
+        ],
+        correct: 1,
+        correctVideo: "videos/q5_correct.mp4",
+        wrongVideo: "videos/q5_wrong.mp4",
+        explainVideo: "videos/q5_explain.mp4"
+    }
+];
+
+// Global State
+let quizState = "intro"; // intro, question, feedback, explain, finished
+let currentQuestionIndex = 0;
+let selectedIndex = null;
+let submitted = false;
+let correctAnswers = 0;
+const totalQuestions = QUESTIONS.length;
+
+// DOM Elements
+const videoPlayer = document.getElementById("videoPlayer");
+const videoLoading = document.getElementById("videoLoading");
+const progressFill = document.getElementById("progressFill");
+const progressCar = document.getElementById("progressCar");
+const progressFlag = document.getElementById("progressFlag");
+const scoreDisplay = document.getElementById("scoreDisplay");
+const progressDotsCount = totalQuestions;
+const questionCard = document.getElementById("questionCard");
+const questionCounter = document.getElementById("questionCounter");
+const questionStatus = document.getElementById("questionStatus");
+const questionText = document.getElementById("questionText");
+const optionsList = document.getElementById("optionsList");
+const submitBtn = document.getElementById("submitBtn");
+const introHint = document.getElementById("introHint");
+const resultModal = document.getElementById("resultModal");
+const modalTopBar = document.getElementById("modalTopBar");
+const modalIcon = document.getElementById("modalIcon");
+const modalTitle = document.getElementById("modalTitle");
+const modalSubtitle = document.getElementById("modalSubtitle");
+const modalCorrect = document.getElementById("modalCorrect");
+const modalPercent = document.getElementById("modalPercent");
+const restartBtn = document.getElementById("restartBtn");
+const confettiContainer = document.getElementById("confettiContainer");
+
+// Initialize
+init();
+function init(){
+    playVideo(INTRO_VIDEO);
+    videoPlayer.addEventListener("ended", handleVideoEnd);
+    submitBtn.addEventListener("click", submitAnswer);
+    restartBtn.addEventListener("click", resetQuiz);
+    updateProgressUI();
+}
+
+function playVideo(src){
+    videoLoading.classList.add("active");
+    videoPlayer.classList.add("fading");
+    setTimeout(()=>{
+        videoPlayer.src = src;
+        videoPlayer.load();
+        videoPlayer.play().catch(e=>{});
+        videoPlayer.oncanplay = ()=>{
+            videoPlayer.classList.remove("fading");
+            videoLoading.classList.remove("active");
+        }
+    },300);
+}
+
+function handleVideoEnd(){
+    switch(quizState){
+        case "intro":
+            showQuestion();
+            break;
+        case "feedback":
+            quizState = "explain";
+            playVideo(QUESTIONS[currentQuestionIndex].explainVideo);
+            break;
+        case "explain":
+            currentQuestionIndex++;
+            if(currentQuestionIndex >= totalQuestions){
+                showFinalResult();
+            } else {
+                showQuestion();
+            }
+            break;
+    }
+}
+
+function showQuestion(){
+    quizState = "question";
+    selectedIndex = null;
+    submitted = false;
+    questionCard.classList.add("visible");
+    introHint.classList.add("hide");
+    questionCounter.textContent = `Question ${currentQuestionIndex+1} of ${totalQuestions}`;
+    questionStatus.style.display = "none";
+    submitBtn.disabled = true;
+    const q = QUESTIONS[currentQuestionIndex];
+    questionText.textContent = q.question;
+    optionsList.innerHTML = "";
+    const letters = ["A","B","C","D"];
+    q.options.forEach((opt,i)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+        btn.dataset.index = i;
+        btn.addEventListener("click",()=>selectOption(i,btn));
+        optionsList.appendChild(btn);
+    });
+}
+
+function selectOption(idx, btn){
+    if(submitted) return;
+    selectedIndex = idx;
+    submitBtn.disabled = false;
+    document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
+    btn.classList.add("selected");
+}
+
+function submitAnswer(){
+    if(submitted || selectedIndex === null) return;
+    submitted = true;
+    const q = QUESTIONS[currentQuestionIndex];
+    const allBtns = document.querySelectorAll(".option-btn");
+    allBtns.forEach(b=>b.disabled = true);
+    questionStatus.style.display = "flex";
+    if(selectedIndex === q.correct){
+        correctAnswers++;
+        questionStatus.className = "question-status correct";
+        questionStatus.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Correct Answer`;
+        allBtns[selectedIndex].classList.add("correct");
+        quizState = "feedback";
+        playVideo(q.correctVideo);
+    } else {
+        questionStatus.className = "question-status wrong";
+        questionStatus.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Incorrect Answer`;
+        allBtns[selectedIndex].classList.add("wrong");
+        allBtns[q.correct].classList.add("correct");
+        quizState = "feedback";
+        playVideo(q.wrongVideo);
+    }
+    updateProgressUI();
+}
+
+function updateProgressUI(){
+    const percent = (correctAnswers / totalQuestions) * 100;
+    progressFill.style.width = percent + "%";
+    progressCar.style.left = percent + "%";
+    scoreDisplay.textContent = `Score: ${correctAnswers}/${totalQuestions}`;
+    modalCorrect.textContent = correctAnswers;
+    modalPercent.textContent = percent + "%";
+    if(correctAnswers === totalQuestions){
+        progressFlag.classList.add("finished");
+    } else {
+        progressFlag.classList.remove("finished");
+    }
+}
+
+function showFinalResult(){
+    questionCard.classList.remove("visible");
+    quizState = "finished";
+    const fullScore = (correctAnswers === totalQuestions);
+    modalTopBar.className = "modal-top-bar " + (fullScore ? "perfect" : "normal");
+    modalIcon.className = "modal-icon " + (fullScore ? "perfect" : "normal");
+    if(fullScore){
+        modalTitle.textContent = "Congratulations!";
+        modalSubtitle.textContent = "You answered all questions correctly! Great understanding of ride-hailing externalities.";
+        launchConfetti();
+    } else {
+        modalTitle.textContent = "Nice Try!";
+        modalSubtitle.textContent = "Review the explanation videos to strengthen your knowledge of ride-hailing externalities.";
+    }
+    resultModal.classList.add("active");
+}
+
+function launchConfetti(){
+    confettiContainer.innerHTML = "";
+    const colors = ["#2D6CDF","#FFB103","#2ECC71","#E74C3C","#9b59b6"];
+    for(let i=0;i<80;i++){
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random()*100 + "%";
+        piece.style.width = (Math.random()*8+4)+"px";
+        piece.style.height = (Math.random()*8+4)+"px";
+        piece.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.animationDuration = (Math.random()*3+2)+"s";
+        confettiContainer.appendChild(piece);
+    }
+    setTimeout(()=>confettiContainer.innerHTML="",5000);
+}
+
+function resetQuiz(){
+    resultModal.classList.remove("active");
+    confettiContainer.innerHTML = "";
+    currentQuestionIndex = 0;
+    correctAnswers = 0;
+    selectedIndex = null;
+    submitted = false;
+    quizState = "intro";
+    introHint.classList.remove("hide");
+    updateProgressUI();
+    playVideo(INTRO_VIDEO);
+}
+</script>
+</body>
+</html>
