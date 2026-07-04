@@ -419,6 +419,28 @@
         }
         .btn svg {width:16px;height:16px;}
 
+        /* Continue Button after answer submit */
+        .continue-wrap {
+            display: none;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .continue-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 11px 30px;
+            border-radius: 9px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+        .continue-btn:hover {
+            background:#255bc9;
+            transform: translateY(-1px);
+        }
+
         .intro-hint {
             text-align:center;
             color:var(--muted-foreground);
@@ -633,6 +655,9 @@
                         </svg>
                     </button>
                 </div>
+                <div class="continue-wrap" id="continueWrap">
+                    <button class="continue-btn" id="continueBtn">Continue</button>
+                </div>
             </div>
         </div>
         <div class="intro-hint" id="introHint">Watch the introduction video to begin the quiz</div>
@@ -668,7 +693,7 @@
 <div class="confetti-container" id="confettiContainer"></div>
 
 <script>
-// Video file paths (REMOVED videos/ prefix, videos same folder as HTML)
+// Video file paths (NO videos/ folder, same directory as HTML)
 const INTRO_VIDEO = "intro.mp4";
 const QUESTIONS = [
     {
@@ -760,6 +785,8 @@ const questionStatus = document.getElementById("questionStatus");
 const questionText = document.getElementById("questionText");
 const optionsList = document.getElementById("optionsList");
 const submitBtn = document.getElementById("submitBtn");
+const continueWrap = document.getElementById("continueWrap");
+const continueBtn = document.getElementById("continueBtn");
 const introHint = document.getElementById("introHint");
 const resultModal = document.getElementById("resultModal");
 const modalTopBar = document.getElementById("modalTopBar");
@@ -774,20 +801,25 @@ const confettiContainer = document.getElementById("confettiContainer");
 // Initialize
 init();
 function init(){
-    playVideo(INTRO_VIDEO);
+    // FIX 1: Load video but DO NOT autoplay initially
+    videoPlayer.src = INTRO_VIDEO;
+    videoPlayer.load();
+
     videoPlayer.addEventListener("ended", handleVideoEnd);
     submitBtn.addEventListener("click", submitAnswer);
+    continueBtn.addEventListener("click", continueAfterSubmit);
     restartBtn.addEventListener("click", resetQuiz);
     updateProgressUI();
 }
 
+// Load & PLAY video ONLY when triggered manually
 function playVideo(src){
     videoLoading.classList.add("active");
     videoPlayer.classList.add("fading");
     setTimeout(()=>{
         videoPlayer.src = src;
         videoPlayer.load();
-        videoPlayer.play().catch(err => console.log("Autoplay blocked, user needs click:", err));
+        videoPlayer.play().catch(err => console.log("Play blocked:", err));
         videoPlayer.oncanplay = ()=>{
             videoPlayer.classList.remove("fading");
             videoLoading.classList.remove("active");
@@ -824,6 +856,8 @@ function showQuestion(){
     questionCounter.textContent = `Question ${currentQuestionIndex+1} of ${totalQuestions}`;
     questionStatus.style.display = "none";
     submitBtn.disabled = true;
+    submitBtn.style.display = "inline-flex";
+    continueWrap.style.display = "none";
     const q = QUESTIONS[currentQuestionIndex];
     questionText.textContent = q.question;
     optionsList.innerHTML = "";
@@ -866,16 +900,26 @@ function submitAnswer(){
         setTimeout(()=>successFlash.classList.remove("active"),700);
 
         quizState = "feedback";
-        playVideo(q.correctVideo);
     } else {
         questionStatus.className = "question-status wrong";
         questionStatus.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Incorrect Answer`;
         allBtns[selectedIndex].classList.add("wrong");
         allBtns[q.correct].classList.add("correct");
         quizState = "feedback";
-        playVideo(q.wrongVideo);
     }
     updateProgressUI();
+
+    // FIX 2: Hide submit, show Continue button (user must click to proceed & autoplay video)
+    submitBtn.style.display = "none";
+    continueWrap.style.display = "flex";
+}
+
+// Continue button click handler
+function continueAfterSubmit(){
+    questionCard.classList.remove("visible");
+    playVideo(QUESTIONS[currentQuestionIndex].feedback === "correct"
+        ? QUESTIONS[currentQuestionIndex].correctVideo
+        : QUESTIONS[currentQuestionIndex].wrongVideo);
 }
 
 function updateProgressUI(){
@@ -893,6 +937,7 @@ function updateProgressUI(){
 }
 
 function showFinalResult(){
+    // FIX 3: Ensure question card is fully hidden so it does not block video/modal
     questionCard.classList.remove("visible");
     quizState = "finished";
     const fullScore = (correctAnswers === totalQuestions);
@@ -933,9 +978,12 @@ function resetQuiz(){
     selectedIndex = null;
     submitted = false;
     quizState = "intro";
+    questionCard.classList.remove("visible");
     introHint.classList.remove("hide");
     updateProgressUI();
-    playVideo(INTRO_VIDEO);
+    // Reset video to intro, paused again
+    videoPlayer.src = INTRO_VIDEO;
+    videoPlayer.load();
 }
 </script>
 </body>
