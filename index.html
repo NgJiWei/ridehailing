@@ -25,8 +25,8 @@
             --destructive-border: #f1a8a2;
             --radius: 12px;
             --shadow-sm: 0 2px 12px rgba(0,0,0,0.02), 0 1px 2px -1px rgba(0,0,0,0.02);
-            --shadow-md: 0 2px 12px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.05);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-md: 0 2px 12px rgba(0,0,0,0.03), 0 3px 6px -2px rgba(0,0,0,0.07);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.14);
         }
 
         * {
@@ -128,7 +128,7 @@
             background: rgba(45, 108, 223, 0.35);
             border-radius: 999px;
             width: 0%;
-            transition: width 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .progress-car {
             position: absolute;
@@ -136,7 +136,7 @@
             transform: translate(-50%, -50%);
             left: 0%;
             z-index: 10;
-            transition: left 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .car-icon {
             width: 32px;
@@ -147,7 +147,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(45,108,223,0.3);
+            box-shadow: 0 3px 10px rgba(45,108,223,0.35);
+            transition: transform 0.2s ease;
+        }
+        .progress-car:active .car-icon {
+            transform: scale(0.92);
         }
         .car-icon svg {width:16px;height:16px;}
 
@@ -169,12 +173,12 @@
         .progress-flag.finished {
             background: var(--success);
             color: white;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 4px 14px rgba(46, 204, 113, 0.45);
         }
         .progress-flag svg {width:16px;height:16px;}
 
-        /* Video Container + OVERLAY QUESTION BOX (Your requested design) */
+        /* Video Container + OVERLAY QUESTION BOX */
         .video-section {
             margin-bottom: 32px;
             animation: fadeInUp 0.6s ease-out 0.2s both;
@@ -196,6 +200,25 @@
             transition: opacity 0.4s ease;
         }
         #videoPlayer.fading {opacity:0;}
+
+        /* Success flash overlay for correct answer */
+        .video-success-flash {
+            position: absolute;
+            inset: 0;
+            background: rgba(46, 204, 113, 0.22);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 4;
+            transition: opacity 0.35s ease;
+        }
+        .video-success-flash.active {
+            animation: successFlash 0.7s ease-out forwards;
+        }
+        @keyframes successFlash {
+            0% {opacity:0;}
+            30% {opacity:1;}
+            100% {opacity:0;}
+        }
 
         .video-loading {
             position: absolute;
@@ -228,16 +251,16 @@
             position: absolute;
             inset: 16px;
             bottom: 16px;
-            background: rgba(255,255,255,0.86);
-            backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
             box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255,255,255,0.35);
+            border: 1px solid rgba(255,255,255,0.4);
             padding: 20px;
             display: none;
             opacity:0;
-            transform: translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateY(22px);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow-y: auto;
             max-height: calc(100% - 32px);
             z-index: 5;
@@ -269,7 +292,7 @@
             gap:4px;
             display:none;
         }
-        .question-status.correct {color:var(--success);display:flex;}
+        .question-status.correct {color:var(--success);display:flex; animation: bounceSmall 0.5s ease-out;}
         .question-status.wrong {color:var(--destructive);display:flex;}
         .question-status svg {width:16px;height:16px;}
 
@@ -300,7 +323,7 @@
             display:flex;
             align-items:center;
             gap:10px;
-            transition:all 0.2s ease;
+            transition:all 0.22s ease;
             font-family:inherit;
         }
         .option-btn:not(:disabled):hover {
@@ -317,6 +340,7 @@
             border-color:var(--success);
             background:var(--success-bg);
             cursor:default;
+            animation: bounceSmall 0.5s ease-out;
         }
         .option-btn.wrong {
             border-color:var(--destructive);
@@ -340,7 +364,7 @@
             justify-content:center;
             font-size:0.78rem;
             font-weight:600;
-            transition:all 0.2s ease;
+            transition:all 0.22s ease;
         }
         .option-btn.selected .option-letter {
             border-color:var(--primary);
@@ -375,7 +399,7 @@
             border-radius:9px;
             border:none;
             cursor:pointer;
-            transition:all 0.2s ease;
+            transition:all 0.22s ease;
             box-shadow:var(--shadow-md);
         }
         .btn-primary {
@@ -533,10 +557,15 @@
         @keyframes fadeInDown {from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
         @keyframes fadeInUp {from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
         @keyframes spin {to{transform:rotate(360deg);}}
+        @keyframes bounceSmall {
+            0% {transform: scale(1);}
+            50% {transform: scale(1.06);}
+            100% {transform: scale(1);}
+        }
         @keyframes bounceIn {
             0% {transform:scale(0) rotate(-20deg);opacity:0;}
             60% {transform:scale(1.1) rotate(5deg);opacity:1;}
-            100% {transform:scale(1) rotate(0deg);opacity:0;}
+            100% {transform:scale(1) rotate(0deg);opacity:1;}
         }
     </style>
 </head>
@@ -582,6 +611,8 @@
     <div class="video-section">
         <div class="video-container">
             <video id="videoPlayer" controls playsinline muted></video>
+            <!-- Green flash overlay for correct answer -->
+            <div class="video-success-flash" id="successFlash"></div>
             <div class="video-loading" id="videoLoading">
                 <div class="spinner"></div>
                 <p>Loading video...</p>
@@ -637,7 +668,7 @@
 <div class="confetti-container" id="confettiContainer"></div>
 
 <script>
-// Video file paths
+// Video file paths (REMOVED videos/ prefix, videos same folder as HTML)
 const INTRO_VIDEO = "intro.mp4";
 const QUESTIONS = [
     {
@@ -718,11 +749,11 @@ const totalQuestions = QUESTIONS.length;
 // DOM Elements
 const videoPlayer = document.getElementById("videoPlayer");
 const videoLoading = document.getElementById("videoLoading");
+const successFlash = document.getElementById("successFlash");
 const progressFill = document.getElementById("progressFill");
 const progressCar = document.getElementById("progressCar");
 const progressFlag = document.getElementById("progressFlag");
 const scoreDisplay = document.getElementById("scoreDisplay");
-const progressDotsCount = totalQuestions;
 const questionCard = document.getElementById("questionCard");
 const questionCounter = document.getElementById("questionCounter");
 const questionStatus = document.getElementById("questionStatus");
@@ -756,7 +787,6 @@ function playVideo(src){
     setTimeout(()=>{
         videoPlayer.src = src;
         videoPlayer.load();
-        // Catch autoplay block error
         videoPlayer.play().catch(err => console.log("Autoplay blocked, user needs click:", err));
         videoPlayer.oncanplay = ()=>{
             videoPlayer.classList.remove("fading");
@@ -823,11 +853,18 @@ function submitAnswer(){
     const allBtns = document.querySelectorAll(".option-btn");
     allBtns.forEach(b=>b.disabled = true);
     questionStatus.style.display = "flex";
+
     if(selectedIndex === q.correct){
+        // Correct answer enhanced effects
         correctAnswers++;
         questionStatus.className = "question-status correct";
         questionStatus.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Correct Answer`;
         allBtns[selectedIndex].classList.add("correct");
+
+        // Green flash over video
+        successFlash.classList.add("active");
+        setTimeout(()=>successFlash.classList.remove("active"),700);
+
         quizState = "feedback";
         playVideo(q.correctVideo);
     } else {
@@ -875,7 +912,7 @@ function showFinalResult(){
 function launchConfetti(){
     confettiContainer.innerHTML = "";
     const colors = ["#2D6CDF","#FFB103","#2ECC71","#E74C3C","#9b59b6"];
-    for(let i=0;i<80;i++){
+    for(let i=0;i<100;i++){
         const piece = document.createElement("div");
         piece.className = "confetti-piece";
         piece.style.left = Math.random()*100 + "%";
